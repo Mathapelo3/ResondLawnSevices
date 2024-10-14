@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Customer Dashboard";
+   
+}
+
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <div class="text-center ">
+                @*                <img src="~/Images/zoomedLogo (2).png" width="200" />
+                *@
+            </div>
+            <br />
+            <h4 class="display-6 text-info text-center text-bold">CUSTOMER DASHBOARD</h4>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="card text-center" style="height:200px">
+                <div class="card-body " style="color: #268aab">
+                    
+                    <div>
+                        <br />
+                    </div>
+                    <h5 class="text-bold">REQUEST Machine</h5>
+                    <p class="card-text text-secondary">View prescriptions.</p>
+                    <button type="button" onclick="location.href = '@Url.Action("RequestMachine","Customer")'" class="btn btn-outline-info">Make Booking</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card text-center" style="height:200px">
+                <div class="card-body" style="color: #268aab">
+                    
+                    <div>
+                        <br />
+                    </div>
+                    <h5 class="text-bold"> MY BOOKINGS</h5>
+                    
+                    <button type="button" class="btn btn-outline-info position-relative" onclick="location.href = '@Url.Action("CustomerBookings","Customer")'" class="btn btn-outline-info">
+                        View
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            3
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+   
+
+
+</section>

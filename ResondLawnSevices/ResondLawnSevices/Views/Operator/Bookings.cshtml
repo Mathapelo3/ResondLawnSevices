@@ -1,0 +1,56 @@
+﻿@model IEnumerable<ResondLawnSevices.ViewModel.BookingVM>
+
+<h2>Your Bookings</h2>
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Machine Name</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Acknowledge</th>
+            <th>Complete Job</th> <!-- New column for completion -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var booking in Model)
+        {
+            <tr>
+                <td>@booking.MachineName</td>
+                <td>@booking.Date.ToShortDateString()</td>
+                <td>@booking.Status</td>
+                <td>
+                    @if (!booking.IsAcknowledged)
+                    {
+                        <form asp-action="Acknowledge" method="post">
+                            <input type="hidden" name="id" value="@booking.Id" />
+                            <button type="submit" class="btn btn-success">Acknowledge</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span>Acknowledged</span>
+                    }
+                </td>
+                <td>
+                    @if (!booking.IsCompleted)
+                    {
+                        <form asp-action="CompleteJob" method="post">
+                            <input type="hidden" name="id" value="@booking.Id" />
+                            <button type="submit" class="btn btn-primary">Complete Job</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span>Completed</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

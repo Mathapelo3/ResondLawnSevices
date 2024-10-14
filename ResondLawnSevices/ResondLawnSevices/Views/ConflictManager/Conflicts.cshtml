@@ -1,0 +1,39 @@
+﻿@model IEnumerable<ResondLawnSevices.ViewModel.ConflictVM>
+
+@{
+    ViewBag.Title = "Conflict Management";
+}
+
+<h2>Conflict Management</h2>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-info">
+        @ViewBag.Message
+    </div>
+}
+
+<h3>Current Conflicts</h3>
+
+@if (Model.Any())
+{
+    @foreach (var conflict in Model)
+    {
+        <div class="conflict-card">
+            <h4>Conflict for Machine: @conflict.MachineName</h4>
+            <p><strong>Customer Name:</strong> @conflict.CustomerName</p>
+            <p><strong>Requested Date:</strong> @conflict.RequestedDate.ToShortDateString()</p>
+            <p><strong>Status:</strong> @conflict.Status</p>
+
+            <form asp-action="ResolveConflict" method="get">
+                <input type="hidden" name="id" value="@conflict.Id" />
+                <button type="submit" class="btn btn-primary">Resolve Conflict</button>
+            </form>
+        </div>
+        <hr />
+    }
+}
+else
+{
+    <p>No conflicts available.</p>
+}

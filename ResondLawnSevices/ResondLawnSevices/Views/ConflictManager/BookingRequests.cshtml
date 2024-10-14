@@ -1,0 +1,35 @@
+﻿@model IEnumerable<ResondLawnSevices.Models.Conflicts>
+
+@{
+    ViewBag.Title = "Conflict Management";
+}
+
+<h2>Conflict Management</h2>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-info">
+        @ViewBag.Message
+    </div>
+}
+
+<h3>Booking Details</h3>
+<form method="post" asp-action="HandleConflict">
+    <div class="mb-3">
+        <label for="inputDate" class="form-label">Request Date</label>
+        <input type="date" id="inputDate" name="Date" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="inputMachineId" class="form-label">Select Machine</label>
+        <select id="inputMachineId" name="MachineId" class="form-select" required>
+            <option value="224">TurboMower 224</option>
+            <option value="112">PowerCutter 112</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Request</button>
+</form>
+
+<h3>Alternative Machines</h3>
+<p>If the TurboMower 224 is booked, we will look for alternative machines.</p>

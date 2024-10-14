@@ -1,0 +1,35 @@
+﻿@model IEnumerable<ResondLawnSevices.ViewModel.BookingVM>
+
+<h2>Your Bookings</h2>
+
+@if (!Model.Any())
+{
+    <p>You have no bookings.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Machine Name</th>
+                <th>Booking Date</th>
+                <th>Status</th>
+                <th>Acknowledged</th>
+                <th>Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Model)
+            {
+                <tr>
+                    <td>@booking.MachineName</td>
+                    <td>@booking.Date.ToShortDateString()</td>
+                    <td>@booking.Status</td>
+                    <td>@(booking.IsAcknowledged ? "Yes" : "No")</td>
+                    <td>@(booking.IsCompleted ? "Yes" : "No")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+

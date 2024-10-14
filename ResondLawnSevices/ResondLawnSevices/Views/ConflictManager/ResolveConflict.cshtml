@@ -1,0 +1,39 @@
+﻿@model ResondLawnSevices.ViewModel.ConflictVM
+
+@{
+    ViewBag.Title = "Resolve Conflict";
+}
+
+<h2>Resolve Conflict for Machine @Model.MachineName</h2>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.Message
+    </div>
+}
+
+<div>
+    <p><strong>Customer Name:</strong> @Model.CustomerName</p>
+    <p><strong>Requested Date:</strong> @Model.RequestedDate.ToShortDateString()</p>
+    <p><strong>Status:</strong> @Model.Status</p>
+</div>
+
+<form asp-action="ResolveConflict" method="post">
+    <input type="hidden" name="conflictId" value="@Model.Id" />
+
+    <div class="mb-3">
+        <label for="machineId" class="form-label">Assign Alternative Machine</label>
+        <select id="machineId" name="machineId" class="form-select" required>
+            @foreach (var machine in ViewBag.Machines)
+            {
+                <option value="@machine.Value">@machine.Text</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Resolve Conflict</button>
+</form>
+
+<hr />
+<a asp-action="Index" class="btn btn-secondary">Back to Conflicts</a>

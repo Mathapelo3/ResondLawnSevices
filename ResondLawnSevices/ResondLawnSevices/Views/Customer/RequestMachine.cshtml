@@ -1,0 +1,46 @@
+﻿@model IEnumerable<ResondLawnSevices.ViewModel.MachineVM>
+
+<div class="row">
+    <div class="col-mb-8 align-content-center">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Book Machine</h5>
+                <form asp-action="RequestMachine" method="post">
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">Select Machine</label>
+                        <div class="col-sm-10">
+                            @if (Model.Any())
+                            {
+                                <select class="form-select" name="MachineId" aria-label="Select machine" required>
+                                    <option value="">-- Select a machine --</option>
+                                    @foreach (var machine in Model)
+                                    {
+                                        <option value="@machine.Id">@machine.Name</option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <span>No machines available for booking.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label for="inputDate" class="col-sm-2 col-form-label">Request Date</label>
+                        <div class="col-sm-10">
+                            <input type="date" id="inputDate" name="Date" class="form-control"
+                                   value="@DateTime.Now.ToString("yyyy-MM-dd")" min="1753-01-01" max="9999-12-31" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-10 offset-sm-2">
+                            <button type="submit" class="btn btn-primary">Submit Form</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+﻿@model IEnumerable<ResondLawnSevices.ViewModel.MachineVM>
+
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-sm-4">
+
+            
+                <div class="card">
+                    <img src="~/Img/@item.Image" width="50" height="50" asp-append-version="true">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Name</h5>
+                        <p class="card-text">@item.Description</p>
+                        <hr />
+                        <a asp-action="RequestMachine" asp-controller="Customer" class="btn btn-success">Request Booking</a>
+                    </div>
+                </div>
+            
+            
+            </div>
+        }
+    }
+</div>

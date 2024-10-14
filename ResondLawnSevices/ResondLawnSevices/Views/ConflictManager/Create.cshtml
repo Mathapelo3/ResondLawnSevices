@@ -1,0 +1,44 @@
+﻿@model ResondLawnSevices.ViewModel.MachineVM
+
+<h4 class="display-6  text-center text-bold" style="color:#0F4229">Add Machine</h4>
+<form asp-action="Create" enctype="multipart/form-data">
+    <div class="row mb-3">
+        <label asp-for="Name" class="col-sm-2 col-form-label">Name</label>
+        <div class="col-sm-10">
+            <input asp-for="Name" class="form-control">
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="Description" class="col-sm-2 col-form-label">Description</label>
+        <div class="col-sm-10">
+            <input asp-for="Description" class="form-control">
+        </div>
+    </div>
+    
+    <div class="row mb-3">
+        <label asp-for="Image" class="col-sm-2 col-form-label">File Upload</label>
+        <div class="col-sm-10">
+            <input asp-for="Image" type="file" class="form-control" accept="image/*">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label class="col-sm-2 col-form-label">Status</label>
+        <div class="col-sm-10">
+            <select asp-for="Status" class="form-select" aria-label="Default select example">
+                <option selected></option>
+                <option value="Available">Available</option>
+                <option value="Booked">Booked</option>
+               
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        
+        <div class="col-sm-10">
+            <button type="submit" class="btn btn-primary">Add Machine</button>
+        </div>
+    </div>
+
+</form>
