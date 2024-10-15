@@ -5,7 +5,6 @@ namespace ResondLawnSevices.Services
 {
     public class EmailServices
     {
-
         private readonly string _smtpServer;
         private readonly int _port;
         private readonly string _username;
@@ -21,23 +20,36 @@ namespace ResondLawnSevices.Services
 
         public async Task SendEmailAsync(string to, string subject, string body)
         {
-            using (var client = new SmtpClient(_smtpServer, _port))
+            try
             {
-                client.Credentials = new NetworkCredential(_username, _password);
-                client.EnableSsl = true;
-
-                var mailMessage = new MailMessage
+                using (var client = new SmtpClient(_smtpServer, _port))
                 {
-                    From = new MailAddress(_username),
-                    Subject = subject,
-                    Body = body,
-                    IsBodyHtml = true,
-                };
-                mailMessage.To.Add(to);
+                    client.Credentials = new NetworkCredential(_username, _password);
+                    client.EnableSsl = true;
 
-                await client.SendMailAsync(mailMessage);
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(_username),
+                        Subject = subject,
+                        Body = body,
+                        IsBodyHtml = true,
+                    };
+                    mailMessage.To.Add(to);
+
+                    await client.SendMailAsync(mailMessage);
+                }
+            }
+            catch (SmtpException smtpEx)
+            {
+                // Log or handle SMTP-specific exceptions
+                Console.WriteLine($"SMTP Exception: {smtpEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Log or handle general exceptions
+                Console.WriteLine($"Email sending failed: {ex.Message}");
             }
         }
-
     }
+
 }

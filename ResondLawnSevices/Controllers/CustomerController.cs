@@ -37,19 +37,12 @@ namespace ResondLawnSevices.Controllers
 
         public async Task<ActionResult> Index()
         {
-            var machines = from m in _context.Machines
-                           select new ViewModel.MachineVM
-                           {
-                               Id = m.Id,
-                               Name = m.Name,
-                               Description = m.Description,
-                               ImageUrl = m.ImageUrl, // Assuming you store image paths here
-                               Status = m.Status
-                           };
-            return View(machines);
+           
+            return View();
         }
 
         // GET: RequestMachine
+        [HttpGet]
         public IActionResult RequestMachine()
         {
             var machines = _context.Machines.ToList();
@@ -79,15 +72,14 @@ namespace ResondLawnSevices.Controllers
 
             var userId = GetLoggedInUserId();
             var date = model.Date;
-            const int turboMowerId = 15;
 
-            // Check availability of TurboMower 224
+            // Check if the machine is already booked for the requested date
             int bookingCount = await _context.Bookings
-                .CountAsync(b => b.MachineId == turboMowerId && b.Date.Date == date.Date);
+                .CountAsync(b => b.MachineId == model.MachineId && b.Date.Date == date.Date);
 
             if (bookingCount == 0)
             {
-                // TurboMower 224 is available, proceed with booking
+                // Machine is available, proceed with booking
                 var booking = new Booking
                 {
                     UserId = userId,
@@ -100,15 +92,17 @@ namespace ResondLawnSevices.Controllers
                 await _context.SaveChangesAsync();
 
                 // Redirect to confirmation
-                return RedirectToAction("Confirmation", new { message = "Booking successful for TurboMower 224." });
+                return RedirectToAction("Confirmation", new { message = "Booking successful." });
             }
             else
             {
-                // TurboMower 224 is already booked, manage conflict
+                // Machine is already booked, handle the conflict
+
+                // Add conflict to the Conflicts table
                 var conflict = new Conflicts
                 {
                     UserId = userId,
-                    MachineId = turboMowerId,
+                    MachineId = model.MachineId,
                     RequestedDate = date,
                     Status = "Routed to conflict manager"
                 };
@@ -116,21 +110,22 @@ namespace ResondLawnSevices.Controllers
                 _context.Conflicts.Add(conflict);
                 await _context.SaveChangesAsync();
 
-                // Check for alternative machines
-                var alternativeMachines = await _context.Bookings
-                    .Where(b => b.Date.Date == date.Date && b.MachineId != turboMowerId)
-                    .Select(b => b.MachineId) // Get machine IDs of booked machines
-                    .Distinct() // Ensure unique machine IDs
+                // Check for alternative machines that are not booked on the same date
+                var alternativeMachines = await _context.Machines
+                    .Where(m => !_context.Bookings
+                        .Any(b => b.MachineId == m.Id && b.Date.Date == date.Date)) // Machines not booked on that date
+                    .Select(m => m.Id)
                     .ToListAsync();
 
                 string message = alternativeMachines.Any()
-                    ? "Conflict: TurboMower 224 is already booked. Suggested alternative machines are available."
-                    : "Conflict: TurboMower 224 is booked for this date. No alternative machines available.";
+                    ? $"Conflict: The selected machine is already booked. Suggested alternatives: {string.Join(", ", alternativeMachines)}."
+                    : "Conflict: The selected machine is already booked and no alternative machines are available.";
 
                 // Redirect to confirmation with conflict message
                 return RedirectToAction("Confirmation", new { message });
             }
         }
+
         private string GetLoggedInUserId()
         {
             if (User.Identity.IsAuthenticated)

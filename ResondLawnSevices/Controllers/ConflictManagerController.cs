@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ResondLawnSevices.Data;
@@ -108,30 +109,11 @@ namespace ResondLawnSevices.Controllers
             {
                 ViewBag.Message = "The selected machine does not exist. Please select a valid machine.";
 
-                // Convert the conflict entity to ConflictVM for the view
-                var conflictVM = new ConflictVM
-                {
-                    Id = conflict.Id,
-                    UserId = conflict.UserId,
-                    CustomerName = conflict.User.Name,
-                    MachineId = conflict.MachineId,
-                    MachineName = conflict.Machine.Name,
-                    RequestedDate = conflict.RequestedDate,
-                    Status = conflict.Status
-                };
-
-                // Pass machines list again to the view
-                var machines = await _context.Machines.ToListAsync();
-                ViewBag.Machines = machines.Select(m => new SelectListItem
-                {
-                    Value = m.Id.ToString(),
-                    Text = m.Name
-                }).ToList();
-
-                return View(conflictVM); // Return the view model back to the view
+                // Populate ViewModel and available machines for re-selection
+                return await ReturnConflictViewModelWithMachines(conflict);
             }
 
-            // Check if the machine is available
+            // Check if the machine is available for the requested date
             var isMachineAvailable = await _context.Bookings
                 .AnyAsync(b => b.MachineId == machineId && b.Date.Date == conflict.RequestedDate.Date);
 
@@ -139,30 +121,11 @@ namespace ResondLawnSevices.Controllers
             {
                 ViewBag.Message = "The selected alternative machine is not available on this date. Please select another machine.";
 
-                // Convert the conflict entity to ConflictVM for the view
-                var conflictVM = new ConflictVM
-                {
-                    Id = conflict.Id,
-                    UserId = conflict.UserId,
-                    CustomerName = conflict.User.Name,
-                    MachineId = conflict.MachineId,
-                    MachineName = conflict.Machine.Name,
-                    RequestedDate = conflict.RequestedDate,
-                    Status = conflict.Status
-                };
-
-                // Pass machines list again to the view
-                var machines = await _context.Machines.ToListAsync();
-                ViewBag.Machines = machines.Select(m => new SelectListItem
-                {
-                    Value = m.Id.ToString(),
-                    Text = m.Name
-                }).ToList();
-
-                return View(conflictVM); // Return the view model back to the view
+                // Populate ViewModel and available machines for re-selection
+                return await ReturnConflictViewModelWithMachines(conflict);
             }
 
-            // Create a new booking
+            // Create a new booking for the selected machine
             var newBooking = new Booking
             {
                 UserId = conflict.UserId,
@@ -171,16 +134,55 @@ namespace ResondLawnSevices.Controllers
                 Status = "Pending"
             };
 
-            // Update the conflict status
-            _context.Bookings.Add(newBooking);
+            // Update conflict status and mark it as resolved
             conflict.Status = $"Resolved - Assigned to Machine ID {machineId}";
 
-            // Save changes
+            // Save the new booking and update conflict
+            _context.Bookings.Add(newBooking);
+            _context.Conflicts.Update(conflict);
             await _context.SaveChangesAsync();
-            await NotifyOperator(newBooking);
 
+            try
+            {
+                // Notify the operator about the new booking, but don't stop the conflict resolution if this fails
+                await NotifyOperator(newBooking);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or notify an admin, but allow conflict resolution to proceed
+                Console.WriteLine($"Email notification failed: {ex.Message}");
+            }
+
+            // Redirect to the conflict manager's view (or an appropriate page)
             return RedirectToAction("Index");
         }
+
+        // Helper method to return ViewModel with available machines
+        private async Task<IActionResult> ReturnConflictViewModelWithMachines(Conflicts conflict)
+        {
+            // Create a ViewModel to pass to the view
+            var conflictVM = new ConflictVM
+            {
+                Id = conflict.Id,
+                UserId = conflict.UserId,
+                CustomerName = conflict.User.Name,
+                MachineId = conflict.MachineId,
+                MachineName = conflict.Machine.Name,
+                RequestedDate = conflict.RequestedDate,
+                Status = conflict.Status
+            };
+
+            // Pass machines list again to the view
+            var machines = await _context.Machines.ToListAsync();
+            ViewBag.Machines = machines.Select(m => new SelectListItem
+            {
+                Value = m.Id.ToString(),
+                Text = m.Name
+            }).ToList();
+
+            return View(conflictVM);
+        }
+
 
 
         [HttpPost]
@@ -198,36 +200,36 @@ namespace ResondLawnSevices.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult Create()
-        {
+        //public IActionResult Create()
+        //{
             
 
-            return View();
-        }
+        //    return View();
+        //}
 
 
-        [HttpPost]
-        public async Task<IActionResult> Create(MachineVM vm)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(vm);
-            }
+        //[HttpPost]
+        //public async Task<IActionResult> Create(MachineVM vm)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(vm);
+        //    }
 
-            string stringFileName = UploadFile(vm);
-            var machine = new Machine
-            {
-                Name = vm.Name,
-                Description = vm.Description,
-                ImageUrl = stringFileName,
-                Status = vm.Status
-            };
+        //    string stringFileName = UploadFile(vm);
+        //    var machine = new Machine
+        //    {
+        //        Name = vm.Name,
+        //        Description = vm.Description,
+        //        ImageUrl = stringFileName,
+        //        Status = vm.Status
+        //    };
 
-            await _context.Machines.AddAsync(machine);
-            await _context.SaveChangesAsync();
+        //    await _context.Machines.AddAsync(machine);
+        //    await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index");
-        }
+        //    return RedirectToAction("Index");
+        //}
 
         private string UploadFile(MachineVM vm)
         {

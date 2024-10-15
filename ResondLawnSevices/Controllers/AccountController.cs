@@ -34,7 +34,14 @@ namespace ResondLawnSevices.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Username);
+                    // Use FindByNameAsync if users are logging in with a username
+                    var user = await _userManager.FindByNameAsync(model.Username);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError(string.Empty, "User not found.");
+                        return View(model);
+                    }
+
                     var roles = await _userManager.GetRolesAsync(user);
 
                     // Redirect based on role
@@ -59,6 +66,8 @@ namespace ResondLawnSevices.Controllers
             }
             return View(model);
         }
+
+
 
 
         public IActionResult Register()

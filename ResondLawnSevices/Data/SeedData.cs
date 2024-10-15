@@ -79,9 +79,8 @@ namespace ResondLawnSevices.Data
             var machines = new List<Machine>
         {
             new Machine { Name = "TurboMower 224" },
-            new Machine { Name = "PowerCutter 112" },
-            new Machine { Name = "GrassChopper 3000" },
-            new Machine { Name = "EcoMower 150" }
+            new Machine { Name = "PowerCutter 112" }
+            
         };
 
             foreach (var machine in machines)

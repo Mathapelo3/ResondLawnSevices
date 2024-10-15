@@ -14,7 +14,7 @@
             <th>Machine </th>
             <th>Request Date</th>
             <th>Status</th>
-            <th>Actions</th>
+            
         </tr>
     </thead>
     <tbody>
@@ -28,14 +28,14 @@
                     <td>@booking.MachineName</td>
                     <td>@booking.Date.ToShortDateString()</td>
                     <td>@booking.Status</td>
-                    <td>
+                    @* <td>
                         <form asp-action="ResolveConflict" asp-controller="ConflictManager" class="btn btn-warning">
-                            <input type="hidden" name="id" value="@booking.Id" />
+                            <input asp-for="@booking.Id" type="hidden" name="id" value="@booking.Id" />
                             <button class="btn btn-info w-100" type="submit">Resolve Conflict</button>
 
                             
                         </form>
-                    </td>
+                    </td> *@
                 </tr>
             }
         }
